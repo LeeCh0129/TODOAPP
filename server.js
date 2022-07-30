@@ -61,6 +61,7 @@ app.post('/add', function(req, res){
         });
 
     });
+<<<<<<< HEAD
 
 });
 
@@ -75,4 +76,10 @@ app.get('/list', function(요청, 응답){
         //디비에 저장된 post라는 collection안의 id가 뭐인 or 제목이 뭐인 or 모든 데이터를 꺼내주세요. find().toArray -> 모든 데이터
     });
 
+=======
+    // console.log(req.body.date);
+    // console.log(req.body.title);
+    //
+    //
+>>>>>>> c7ad60bae891ff2a0ea7ae4401e5b2a771c9eb59
 });
