@@ -44,10 +44,13 @@ app.get('/write',function(req, res){
 
 app.post('/add', function(req, res){
     res.send('전송완료');
-    db.collection('post').insertOne( { 제목 : 요청.body.title, 날짜 : 요청.body.date}, function(){
-        console.log('저장완료') // 어떤 사람이 /add 라는 경로로 post 요청을 하면, 데이터 2개(날짜, 제목)를 보내주는데, 이때, ‘post’라는 이름을 가진 collection에 두개 데이터를 저장하기
+    console.log(req.body.date);
+    console.log(req.body.title);
+    db.collection('post').insertOne( { 제목 : req.body.title, 날짜 : req.body.date}, function(){
+        console.log('저장완료');
     });
-    // console.log(req.body.date);
-    // console.log(req.body.title);
-    //
 });
+
+// /list로 GET요청으로 접속하면
+// 실제 DB에 저장된 데이터들로 예쁘게 꾸며진 HTML을 보여줌
+
