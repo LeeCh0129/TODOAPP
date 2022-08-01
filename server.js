@@ -26,33 +26,33 @@ MongoClient.connect('mongodb+srv://admin:1424125abb!@cluster0.o2erudw.mongodb.ne
 
 // 누군가가 /pet 으로 방문을 하면... pet관련된 안내문을 띄워주자
 
-app.get('/beauty',function(req, res){
-    res.send('뷰티용품 쇼핑할 수 있는 페이지입니다.');
+app.get('/beauty',function(요청, 응답){
+    응답.send('뷰티용품 쇼핑할 수 있는 페이지입니다.');
 });
 
-app.get('/pet',function(req, res){
-    res.send('펫용품 쇼핑할 수 있는 페이지입니다.');
+app.get('/pet',function(요청, 응답){
+    응답.send('펫용품 쇼핑할 수 있는 페이지입니다.');
 });
 
-app.get('/',function(req, res){
-    res.sendFile(__dirname + '/index.html');
+app.get('/',function(요청, 응답){
+    응답.sendFile(__dirname + '/index.html');
 });
 
-app.get('/write',function(req, res){
-    res.sendFile(__dirname + '/write.html');
+app.get('/write',function(요청, 응답){
+    응답.sendFile(__dirname + '/write.html');
 });
 
 // 어떤 사람이 /add 경로로 POST 요청을 하면... ??를 해주세요~
 
-app.post('/add', function(req, res){
-    res.send('전송완료');
+app.post('/add', function(요청, 응답){
+    응답.send('전송완료');
     db.collection('counter').findOne({name : '게시물갯수'}, function(에러, 결과){
         console.log(결과.totalPost)
         var 총게시물갯수 = 결과.totalPost;
-        console.log(req.body.date);
-        console.log(req.body.title);
+        // console.log(req.body.date);
+        // console.log(req.body.title);
 
-        db.collection('post').insertOne( { _id : 총게시물갯수 + 1, 제목 : req.body.title, 날짜 : req.body.date}, function(){
+        db.collection('post').insertOne( { _id : 총게시물갯수 + 1, 제목 : 요청.body.title, 날짜 : 요청.body.date}, function(){
             console.log('저장완료');
             // counter라는 콜렉션에 있는 totalPost 라는 항목도 1 증가시켜야함 (수정);
             db.collection('counter').updateOne({name:'게시물갯수'}, { $inc : {totalPost:1} }, function(에러, 결과){
@@ -61,7 +61,6 @@ app.post('/add', function(req, res){
         });
 
     });
-<<<<<<< HEAD
 
 });
 
@@ -76,10 +75,22 @@ app.get('/list', function(요청, 응답){
         //디비에 저장된 post라는 collection안의 id가 뭐인 or 제목이 뭐인 or 모든 데이터를 꺼내주세요. find().toArray -> 모든 데이터
     });
 
-=======
-    // console.log(req.body.date);
-    // console.log(req.body.title);
-    //
-    //
->>>>>>> c7ad60bae891ff2a0ea7ae4401e5b2a771c9eb59
 });
+
+// app.delete('/delete', function(요청, 응답){
+//     console.log(요청.body); // 요청시 함께 보낸 데이터 찾기
+//     요청.body._id = parseInt(요청.body._id); // 요청.body에 담겨온 게시물번호를 가진 글을 db에서 찾아서 삭제
+//     db.collection('post').deleteOne(요청.body, function(에러, 결과){
+//         console.log('삭제완료')
+//     })
+//     응답.send('삭제완료')
+// });
+
+app.delete('/delete', function(요청, 응답){
+    요청.body._id = parseInt(요청.body._id)
+    db.collection('post').deleteOne(요청.body, function(에러, 결과){
+      console.log('삭제완료');
+      응답.status(200).send({ message : '성공했습니다'});
+    })
+
+  });
