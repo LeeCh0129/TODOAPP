@@ -2,7 +2,8 @@ const express = require('express');
 const app = express();
 app.use(express.urlencoded({extended: true}));
 app.set('view engine', 'ejs');
-
+const methodOverride = require('method-override');
+app.use(methodOverride('_method'));
 app.use('/public', express.static('public'));
 
 
@@ -43,6 +44,11 @@ app.get('/',function(요청, 응답){
 app.get('/write',function(요청, 응답){
     응답.sendFile(__dirname + '/write.html');
 });
+
+// app.get('/write', function(요청, 응답){
+//     응답.render('write.ejs');
+//     응답.sendFile(__dirname + '/write.html');
+// });
 
 // 어떤 사람이 /add 경로로 POST 요청을 하면... ??를 해주세요~
 
@@ -107,3 +113,18 @@ app.get('/detail/:id', function(요청, 응답){
     })
     
 })
+
+app.get('/edit/:id', function(요청, 응답){
+    
+    db.collection('post').findOne({_id : parseInt(요청.params.id)}, function(에러, 결과){
+        console.log(결과)
+        응답.render('edit.ejs', { post : 결과 })
+    })  
+})
+
+app.put('/edit', function(요청, 응답){
+    db.collection('post').updateOne({ _id : parseInt(요청.body.id) }, { $set : { 제목 : 요청.body.title, 날짜 : 요청.body.date } }, function(에러, 결과){
+        console.log('수정완료')
+        응답.redirect('/list')
+    })
+});
