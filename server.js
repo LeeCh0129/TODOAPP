@@ -5,6 +5,7 @@ app.set('view engine', 'ejs');
 const methodOverride = require('method-override');
 app.use(methodOverride('_method'));
 app.use('/public', express.static('public'));
+// require('dotenv').config();
 
 
 var db;
@@ -13,17 +14,27 @@ MongoClient.connect('mongodb+srv://admin:1424125abb!@cluster0.o2erudw.mongodb.ne
     // 연결되면 할 일
     if (에러) return console.log(에러)
     db = client.db('todoapp'); // todoapp 이라는 database(폴더)에 연결
-
     // db.collection('post').insertOne( {이름: 'John', _id : 100}, function(에러, 결과){
     //     console.log('저장완료');
     // }); 
     // post라는 파일에 저장
-
     app.listen(8080, function(){
         console.log('listening on 8080')
     });
-
 })
+
+
+// // server.js에서 env 파일의 변수들을 불러올 때는 process.env.변수이름 이렇게 불러올 수 있음.
+// // env파일(환경변수)을 적용하는 server.js 코드
+// var db;
+//   const MongoClient = require('mongodb').MongoClient;
+//   MongoClient.connect(process.env.DB_URL, function(err, client){
+//   if (err) return console.log(err)
+//   db = client.db('Example1');
+//   app.listen(process.env.PORT, function() {
+//     console.log('listening on 8080')
+//   })
+// }) 
 
 
 
@@ -199,3 +210,14 @@ passport.deserializeUser(function(아이디, done){
     })
     
 }); // 마이페이지 접속시 발동
+
+app.get('/search', (요청, 응답) => {
+    console.log(요청.query);
+    db.collection('post').find({제목 : 요청.query.value}).toArray((에러, 결과)=> {
+        console.log(결과)
+        응답.render('search.ejs', {posts : 결과})
+    })
+});
+// 그냥 find()로 DB의 데이터 내용을 다 찾는건 항상 오래걸림 -> indexing 해두면 게시물 1억개라도 찾기 빨라짐
+// Binary Search -> 미리 숫자순으로 정렬이 되어있어야 사용가능
+
