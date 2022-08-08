@@ -212,8 +212,21 @@ passport.deserializeUser(function(아이디, done){
 }); // 마이페이지 접속시 발동
 
 app.get('/search', (요청, 응답) => {
-    console.log(요청.query);
-    db.collection('post').find({제목 : 요청.query.value}).toArray((에러, 결과)=> {
+    var 검색조건 = [
+        {
+            $search: {
+                index: 'titleSearch',
+                text: {
+                    query: 요청.query.value,
+                    path: '제목' // 제목날짜 둘다 찾고 싶으면 ['제목', '날짜']
+                }
+            }
+        },
+        { $sort : {_id : 1 } }, // 결과 정렬
+        { $limit : 10 }, // 상위 몇개 가져올지
+        // { $project : {제목: 1, _id: 1, score: { $meta: "searchScore" } } } // 검색조건에서 검색결과에서 필터주기, 1은 가져오기, 0은 안가져옴
+    ]
+    db.collection('post').aggregate(검색조건).toArray((에러, 결과)=> {
         console.log(결과)
         응답.render('search.ejs', {posts : 결과})
     })
