@@ -271,8 +271,52 @@ app.get('/search', (요청, 응답) => {
 app.use('/shop', require('./routes/shop.js')); // server.js에 shop.js 라우터 첨부 ./ -> 현재경로를 뜻함. 
 app.use('/board/sub', require('./routes/board.js'));
 
+let multer = require('multer');
+var storage = multer.diskStorage({
 
+  destination : function(req, file, cb){
+    cb(null, './public/image')
+  },
+  filename : function(req, file, cb){
+    cb(null, file.originalname )
+  },
+  filefilter : function(req, file, callback){ // 파일 형식 (확장자) 거르기
+    var ext = path.extname(file.originalname);
+    if(ext !== '.png' && ext !== '.jpg' && ext !== '.jpeg') {
+        return callback(new Error('PNG, JPG만 업로드하세요'))
+    }
+    callback(null, true)
+  },
+  limits:{
+    fileSize: 1024 * 1024
+  }
+
+});
+
+var upload = multer({storage : storage});
+
+// let multer = require('multer');
+// var storage = multer.diskStorage({
+//     destination : function(요청, 파일, cb){
+//         cb(null, './public/image')
+//     },
+//     filename : function(요청, 파일, cb){
+//         cb(null, 파일.originalname ) // 저장한 이미지의 파일명 설정하는 부분 - 기존 오리지널 파일 네임으로 저장
+//     }
+// }); // 같은 폴더안에 저장
+
+// var upload = multer({storage : storage});
 
 app.get('/upload', function(요청, 응답){
     응답.render('upload.ejs')
+});
+
+// upload.ejs - input의 name속성 이름
+app.post('/upload', upload.single('profile'), function(요청, 응답){
+    응답.send('업로드완료')
+});
+
+//업로드한 이미지 보여주기
+app.get('/image/:imageName', function(요청, 응답){
+    응답.sendFile( __dirname + '/public/image/' + 요청.params.imageName ) // __dirname : 현재파일 경로
 })
