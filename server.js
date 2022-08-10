@@ -125,7 +125,7 @@ const LocalStrategy = require('passport-local').Strategy;
 const session = require('express-session');
 
 app.use(session({secret : '비밀코드', resave : true, saveUninitialized : false}));
-app.use(passport.initialize());
+app.use(passport.initialize()); // 미들웨어 : 요청과 응답 사이에 실행되는 코드 - 전역 미들웨어
 app.use(passport.session());
 
 
@@ -265,3 +265,14 @@ app.get('/search', (요청, 응답) => {
 // 그냥 find()로 DB의 데이터 내용을 다 찾는건 항상 오래걸림 -> indexing 해두면 게시물 1억개라도 찾기 빨라짐
 // Binary Search -> 미리 숫자순으로 정렬이 되어있어야 사용가능
 
+
+
+// 고객이 / 경로로 요청했을 때 이런 미들웨어를 적용
+app.use('/shop', require('./routes/shop.js')); // server.js에 shop.js 라우터 첨부 ./ -> 현재경로를 뜻함. 
+app.use('/board/sub', require('./routes/board.js'));
+
+
+
+app.get('/upload', function(요청, 응답){
+    응답.render('upload.ejs')
+})
