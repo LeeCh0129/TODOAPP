@@ -275,10 +275,10 @@ let multer = require('multer');
 var storage = multer.diskStorage({
 
   destination : function(req, file, cb){
-    cb(null, './public/image')
+    cb(null, './public/image') // 같은 폴더안에 저장
   },
   filename : function(req, file, cb){
-    cb(null, file.originalname )
+    cb(null, file.originalname ) // 저장한 이미지의 파일명 설정하는 부분 - 기존의 파일 이름으로 저장
   },
   filefilter : function(req, file, callback){ // 파일 형식 (확장자) 거르기
     var ext = path.extname(file.originalname);
@@ -294,18 +294,6 @@ var storage = multer.diskStorage({
 });
 
 var upload = multer({storage : storage});
-
-// let multer = require('multer');
-// var storage = multer.diskStorage({
-//     destination : function(요청, 파일, cb){
-//         cb(null, './public/image')
-//     },
-//     filename : function(요청, 파일, cb){
-//         cb(null, 파일.originalname ) // 저장한 이미지의 파일명 설정하는 부분 - 기존 오리지널 파일 네임으로 저장
-//     }
-// }); // 같은 폴더안에 저장
-
-// var upload = multer({storage : storage});
 
 app.get('/upload', function(요청, 응답){
     응답.render('upload.ejs')
