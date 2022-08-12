@@ -155,6 +155,9 @@ function 로그인했니(요청, 응답, next){
 }
 
 
+
+
+
 //채팅방 기능
 app.post('/chatroom', 로그인했니, function(요청, 응답){
 
@@ -191,6 +194,43 @@ app.post('/message', 로그인했니, function(요청, 응답){
         응답.send('DB저장성공')
     
     })
+
+});
+
+
+// Server Sent Events 서버와 유저간 실시간 소통채널 열기
+app.get('/message/:id', 로그인했니, function(요청, 응답){
+
+    // Header를 이렇게 수정해주세요.
+    응답.writeHead(200, {
+        "Connection": "keep-alive",
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache",
+    });
+    // GET 요청시 서버로 데이터 전송하려면 URL 파라미터 or query string
+
+    // 일반 GET, POST 요청은 1회요청시 1회응답만 가능 - But Header를 위 코드처럼 수정하면 여러번 응답가능
+    db.collection('message').find({ parent : 요청.params.id }).toArray().then((결과)=>{
+        응답.write('event: test\n'); // 유저에게 데이터 전송은 evnet:보낼데이터이름 \n
+        응답.write('data: ' + JSON.stringify(결과) + '\n\n'); // object, array에 따옴표치면 -> JSON (JSON은 문자취급받음.)
+    })
+
+    // MongoDB change Stream 쓰면 실시간 업데이트 가능 - DB가 업데이트되면 유저에게 쏴주세요.
+    // Change Stream 설정해놓으면 DB 변동시 -> 서버에 알려줌 -> 유저에게 보낼 수 있음.
+
+    const pipeline = [
+        { $match: { 'fullDocument.parent': 요청.params.id} } // 컬렉션 안의 원하는 doucument 감시하고 싶으면 - 이런 documnet가 추가/수정/삭제되면
+    ];
+    const collection = db.collection('message');
+    const changeStream = collection.watch(pipeline); // .watch() 붙이면 실시간 감시해줌
+    // 해당 컬렉션에 변동생기면 아래 코드 실행됨. - 일종의 이벤트 리스너
+    changeStream.on('change', (result)=>{
+        //여기 코드 실행
+        응답.write('event: test\n');
+        응답.write('data: ' + JSON.stringify([result.fullDocument]) + '\n\n');
+        console.log(result.fullDocument)
+        // result.fullDocument
+    });
 
 });
 
@@ -309,6 +349,8 @@ app.get('/search', (요청, 응답) => {
 
 
 
+
+
 // 고객이 / 경로로 요청했을 때 이런 미들웨어를 적용
 app.use('/shop', require('./routes/shop.js')); // server.js에 shop.js 라우터 첨부 ./ -> 현재경로를 뜻함. 
 app.use('/board/sub', require('./routes/board.js'));
@@ -335,6 +377,9 @@ var storage = multer.diskStorage({
   }
 
 });
+
+
+
 
 var upload = multer({storage : storage});
 
