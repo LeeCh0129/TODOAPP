@@ -41,7 +41,7 @@
           <h4>할일 제목 : <%= posts[i].제목 %></h4>
           <p>할일 마감날짜 : <%= posts[i].날짜 %></p>
           <button class="btn btn-danger delete" data-id="<%= posts[i]._id %>">삭제</button>
-          <button class="btn btn-secondary chat" data-id="<%= posts[i]._작성자 %>">채팅</button>
+          <button class="btn btn-secondary chat" data-id="<%= posts[i].작성자 %>">채팅</button>
         </li>
         <% } %>
       </ul>
@@ -50,7 +50,7 @@
     <script>
       $('.chat').click(function(e){
         var _id= e.target.dataset.id;
-        $.post('/chatroom', { SufferUserid: _id}).then(()=>{
+        $.post('/chatroom', {당한사람id:_id}).then(()=>{
           console.log('덧글 게시물 생성완료')
         })
       });

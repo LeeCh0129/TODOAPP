@@ -5,8 +5,9 @@ app.set('view engine', 'ejs');
 const methodOverride = require('method-override');
 app.use(methodOverride('_method'));
 app.use('/public', express.static('public'));
+const {ObjectId} = require('mongodb');
 // require('dotenv').config();
-const { ObjectId } = require('mongodb'); // ObjectId()안에 담기
+
 
 
 var db;
@@ -153,18 +154,44 @@ function 로그인했니(요청, 응답, next){
     }
 }
 
+
 //채팅방 기능
 app.post('/chatroom', 로그인했니, function(요청, 응답){
 
     var 저장할거 = {
         title : '무슨무슨채팅방',
-        member : [ObjectId(요청.body.SufferUserid), 요청.user._id],
+        member : [ObjectId(요청.body.당한사람id), 요청.user._id],
         date : new Date()
     }
     
     db.collection('chatroom').insertOne(저장할거).then((결과)=>{
         응답.send('저장완료')
     });
+});
+
+app.get('/chat', 로그인했니, function(요청, 응답){
+
+    db.collection('chatroom').find({ member : 요청.user._id }).toArray().then((결과)=>{
+        응답.render('chat.ejs',{data :결과 }) // chat.ejs 보여주기
+    })
+
+});
+
+app.post('/message', 로그인했니, function(요청, 응답){
+
+    var 저장할거 = {
+        parent : 요청.body.parent,
+        content : 요청.body.content,
+        userid : 요청.user._id,
+        date : new Date(),
+    }
+
+    db.collection('message').insertOne(저장할거).then(()=>{
+        console.log('DB저장성공');
+        응답.send('DB저장성공')
+    
+    })
+
 });
 
 
