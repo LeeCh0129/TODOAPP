@@ -6,6 +6,7 @@ const methodOverride = require('method-override');
 app.use(methodOverride('_method'));
 app.use('/public', express.static('public'));
 // require('dotenv').config();
+const { ObjectId } = require('mongodb'); // ObjectId()안에 담기
 
 
 var db;
@@ -152,6 +153,20 @@ function 로그인했니(요청, 응답, next){
     }
 }
 
+//채팅방 기능
+app.post('/chatroom', 로그인했니, function(요청, 응답){
+
+    var 저장할거 = {
+        title : '무슨무슨채팅방',
+        member : [ObjectId(요청.body.SufferUserid), 요청.user._id],
+        date : new Date()
+    }
+    
+    db.collection('chatroom').insertOne(저장할거).then((결과)=>{
+        응답.send('저장완료')
+    });
+});
+
 
 
 passport.use(new LocalStrategy({
@@ -272,8 +287,9 @@ app.use('/shop', require('./routes/shop.js')); // server.js에 shop.js 라우터
 app.use('/board/sub', require('./routes/board.js'));
 
 let multer = require('multer');
+const { ObjectID } = require('bson');
 var storage = multer.diskStorage({
-
+// S3 Storage
   destination : function(req, file, cb){
     cb(null, './public/image') // 같은 폴더안에 저장
   },
