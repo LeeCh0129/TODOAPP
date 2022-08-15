@@ -8,6 +8,10 @@ app.use('/public', express.static('public'));
 const {ObjectId} = require('mongodb');
 // require('dotenv').config();
 
+const http = require('http').createServer(app);
+const {Server} = require('socket.io');
+const io = new Server(http);
+
 
 
 var db;
@@ -20,11 +24,33 @@ MongoClient.connect('mongodb+srv://admin:1424125abb!@cluster0.o2erudw.mongodb.ne
     //     console.log('저장완료');
     // }); 
     // post라는 파일에 저장
-    app.listen(8080, function(){
+    http.listen(8080, function(){
         console.log('listening on 8080')
     });
 })
 
+app.get('/socket', function(요청, 응답){
+    응답.render('socket.ejs')
+})
+
+io.on('connection', function(socket){
+    console.log('유저접속');
+
+    socket.on('room1-send', function(data){
+        io.to('room1').emit('broadcast', data)
+    });
+
+    socket.on('joinroom', function(data){
+        socket.join('room1');
+    });
+
+    socket.on('user-send', function(data){
+        // 서버 -> 유저 메세지 전송 io.emit() - 모든 유저에게 메시지 보냄, 메세지 수신은 언제나 socket.on()
+        io.emit('broadcast', data)
+        // io.to(socket.id).emit('broadcast', data) // 서버 - 유저 1명간 단독으로 소통
+    });
+    
+});
 
 // // server.js에서 env 파일의 변수들을 불러올 때는 process.env.변수이름 이렇게 불러올 수 있음.
 // // env파일(환경변수)을 적용하는 server.js 코드
