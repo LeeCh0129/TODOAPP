@@ -8,11 +8,11 @@ router.use(session({secret : '비밀코드', resave : true, saveUninitialized : 
 router.use(passport.initialize()); // 미들웨어 : 요청과 응답 사이에 실행되는 코드 - 전역 미들웨어
 router.use(passport.session());
 
-router.get('/login', function(요청, 응답){
+router.get('/', function(요청, 응답){
     응답.render('login.ejs')
 });
 
-router.post('/login', passport.authenticate('local', {
+router.post('/', passport.authenticate('local', {
     failureRedirect : '/fail'
 }), function(요청, 응답){
     응답.redirect('/')

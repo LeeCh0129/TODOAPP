@@ -41,11 +41,48 @@
           <h4>할일 제목 : <%= posts[i].제목 %></h4>
           <p>할일 마감날짜 : <%= posts[i].날짜 %></p>
           <button class="btn btn-danger delete" data-id="<%= posts[i]._id %>">삭제</button>
+          <!-- <button class="btn btn-primary edit" data-id="<%= posts[i]._id %>">수정</button> -->
           <button class="btn btn-secondary chat" data-id="<%= posts[i].작성자 %>">채팅</button>
         </li>
         <% } %>
       </ul>
     </div>
+    <script>
+
+      $('.delete').click(function(e){ // class 명이 delete인 요소를 클릭하면 내부 코드를 실행
+        var 글번호 = e.target.dataset.id; // 내가 누른 요소의 data-id
+        var 지금누른거 = $(this);
+        $.ajax({
+        method : 'DELETE',
+        url : '/delete',
+        data : {_id : 글번호}
+        }).done(function(결과){
+
+          console.log('성공');
+          지금누른거.parent('li').fadeOut();
+          
+        }).fail(function(xhr, textStatus, errorThrown){
+
+          console.log(xhr, textStatus, errorThrown);
+
+        });
+      })
+
+    </script>
+
+    <script>
+      $('.edit').click(function(e){
+        var 글번호 = e.target.dataset.id;
+        var 지금누른거 = $(this);
+        $.ajax({
+          method : 'EDIT',
+          url : '/edit',
+          data : {_id : 글번호}
+        }).done(function(결과){
+          console.log('수정')
+        });
+      })
+    </script>
 
     <script>
       $('.chat').click(function(e){
@@ -62,28 +99,7 @@
       <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
 
 
-      <script>
 
-        $('.delete').click(function(e){ // class 명이 delete인 요소를 클릭하면 내부 코드를 실행
-          var 글번호 = e.target.dataset.id; // 내가 누른 요소의 data-id
-          var 지금누른거 = $(this);
-          $.ajax({
-          method : 'DELETE',
-          url : '/delete',
-          data : {_id : 글번호}
-          }).done(function(결과){
-
-            console.log('성공');
-            지금누른거.parent('li').fadeOut();
-            
-          }).fail(function(xhr, textStatus, errorThrown){
-
-            console.log(xhr, textStatus, errorThrown);
-
-          });
-        })
-
-      </script>
 
 
 
